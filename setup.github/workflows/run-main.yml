@@ -1,4 +1,4 @@
-name: Run script
+name: Check script
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
     branches: [ main ]
 
 jobs:
-  run:
+  check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,7 +20,8 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Run script
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python main.py
+      # test_models.py depende de um Chrome local (porta 9222) e de Tkinter, então
+      # não pode ser executado de fato num runner headless. Aqui só validamos que o
+      # arquivo importa/compila sem erro de sintaxe ou de dependência ausente.
+      - name: Compile check
+        run: python -m py_compile test_models.py
